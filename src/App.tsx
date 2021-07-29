@@ -1,43 +1,49 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import TodoList from './components/TodoList';
+import React, { useState } from 'react'
+import './App.css'
+import TodoList from './components/TodoList'
+import { uuid } from 'uuidv4'
 
 export type TasksType = {
-  id: number
+  id: number | string
   title: string
   isDone: boolean
 }
+export type filterType = 'all'|'active'|'completed'
 
-export type filterType = 'all'|'active'|'complited'
+
 function App() {
 
-  let [tasks, setTasks] = useState ([
-    {id: 1, title: 'HTML&CSS',isDone: true},
-    {id: 2, title: 'JS',isDone: true},
-    {id: 3, title: 'ReactJS',isDone: false},
-    {id: 4, title: 'Rest API',isDone: false},
-    {id: 5, title: 'GraphQL',isDone: false},
+  let [tasks, setTasks] = useState<Array<TasksType>>([
+    {id: uuid(), title: 'HTML&CSS',isDone: true},
+    {id: uuid(), title: 'JS',isDone: true},
+    {id: uuid(), title: 'ReactJS',isDone: false},
+    {id: uuid(), title: 'Rest API',isDone: false},
+    {id: uuid(), title: 'GraphQL',isDone: false},
   ])
+  let [titleValue, setTitleValue] = useState<string>('')
+  let [filter, setFilter] = useState<filterType>('all')
 
-let [filter, setFilter] = useState<filterType>('all')
+
   let filterTasks = tasks
-if (filter === 'active'){
+  if (filter === 'active'){
     filterTasks = tasks.filter(task=>task.isDone === false)
-  }else if (filter === 'complited'){
+  }else if (filter === 'completed'){
     filterTasks = tasks.filter(task=>task.isDone === true)
   }
-  
-
-
-  
-  function setFilters(filter:filterType){
+  const setFilters =(filter:filterType)=>{
     setFilter(filter)
   }
 
-  function removeTask (id:number){
+  const removeTask =(id:number | string)=>{
     let filterTasks = tasks.filter(t=>t.id !== id)
       setTasks(filterTasks)
+  }
+  const addTask =()=>{
+    let newTask={id: uuid(), title: titleValue,isDone: false}
+
+    setTasks([newTask,...tasks])
+    setTitleValue('')
+
   }
 
 
@@ -45,11 +51,14 @@ if (filter === 'active'){
     <div className="App">
       <TodoList title='What to Learn' 
       tasks={filterTasks} 
+      titleValue={titleValue}
+      setTitleValue={setTitleValue}
       removeTask={removeTask}
       setFilters={setFilters}
+      addTask={addTask}
       />
     </div>
-  );
+  )
 }
 
 export default App;

@@ -22,6 +22,7 @@ function App() {
   ])
   let [titleValue, setTitleValue] = useState<string>('')
   let [filter, setFilter] = useState<filterType>('all')
+  let [requerInput, setRequerInput] = useState<boolean | null>(null)
 
 
   let filterTasks = tasks
@@ -40,10 +41,26 @@ function App() {
   }
   const addTask =()=>{
     let newTask={id: uuid(), title: titleValue,isDone: false}
+      setRequerInput(false)
+      if (titleValue.trim() !== '') {
+        setTasks([newTask,...tasks])
+        setTitleValue('')
+      } else {
+        setRequerInput(true)
+      }
+    
 
-    setTasks([newTask,...tasks])
-    setTitleValue('')
-
+  }
+  const changeTaskChecked =(taskId: string | number)=>{
+      const changeTasks = tasks.map(task =>{
+        if (task.id === taskId) 
+          return {...task, isDone: !task.isDone}
+        return task
+        
+        
+      })
+      setTasks(changeTasks)
+      
   }
 
 
@@ -56,6 +73,10 @@ function App() {
       removeTask={removeTask}
       setFilters={setFilters}
       addTask={addTask}
+      filter={filter}
+      requerInput={requerInput}
+      changeTaskChecked={changeTaskChecked}
+      setRequerInput={setRequerInput}
       />
     </div>
   )

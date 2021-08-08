@@ -1,57 +1,77 @@
-import React, { ChangeEvent, KeyboardEvent } from "react"
-import { filterType, TasksType } from "../App"
+import React, { ChangeEvent, KeyboardEvent, useState } from "react"
+import { FilterType, TaskType } from "../App"
 
 type PropsType = {
+   id: string 
    title : string
-   tasks: Array<TasksType>
-   titleValue: string
+   tasks: Array<TaskType>
    filter: string
-   requerInput: boolean | null
-   removeTask: (id:number  | string)=>void
-   setFilters: (task: filterType)=>void
-   addTask:()=>void
-   setTitleValue:(value:string)=>void
-   changeTaskChecked: (taskId: number|string)=>void
-   setRequerInput: (req: boolean | null)=>void
+   removeTask: (id:string,todoListId: string)=>void
+   setFilters: (task: FilterType,todoListId: string)=>void
+   addTask:(title: string,todoListId: string)=>void
+   changeTaskChecked: (taskId: string,todoListId: string)=>void
+   removeTodoList: (id: string)=>void
 }
 
 function TodoList(props: PropsType) {
 
+      let [titleValue, setTitleValue] = useState<string>('')
+      let [requerInput, setRequerInput] = useState<boolean | null>(null)
+
+
    const setTitleValueHandler =(event:ChangeEvent<HTMLInputElement>)=>{
-      props.setTitleValue(event.currentTarget.value)
+      setTitleValue(event.currentTarget.value)
    }
    const addTaskOnKeyPressHandler =(event: KeyboardEvent<HTMLInputElement>)=>{
-      props.setRequerInput(null)
-      if (event.charCode === 13) props.addTask()
+      setRequerInput(null)
+      if (event.charCode === 13) {
+
+         if (titleValue.trim() !== '') {
+            setRequerInput(false)
+            props.addTask(titleValue,props.id)
+            setTitleValue('')
+         } else {
+            setRequerInput(true)
+         }
+      }
    }
-   const addTaskHandler= ()=>props.addTask()
-   const onAllClickHandler = ()=> props.setFilters('all')
-   const onActiveClickHandler = ()=>props.setFilters('active')
-   const onCompletedClickHandler = ()=>props.setFilters('completed')
-   
+   const addTaskHandler= ()=>{
+      if (titleValue.trim() !== '') {
+            setRequerInput(false)
+            props.addTask(titleValue,props.id)
+            setTitleValue('')
+         } else {
+            setRequerInput(true)
+         }
+   }
+   const onAllClickHandler = ()=> props.setFilters('all',props.id)
+   const onActiveClickHandler = ()=>props.setFilters('active',props.id)
+   const onCompletedClickHandler = ()=>props.setFilters('completed',props.id)
+   const removeTodoListHandler = ()=>props.removeTodoList(props.id)
 
 
    return (
       <div className='todo-list'>
-         <h3>{props.title}</h3>
+         <h3>{props.title} <button onClick={removeTodoListHandler}>x</button></h3>
+         
          <div>
             <input 
-               // required={props.requerInput}
+               className={requerInput ? 'requer' : ''}
                id='titleValue'
-               type="text" value={props.titleValue} 
+               type="text" value={titleValue} 
                onChange={setTitleValueHandler}
                onKeyPress={addTaskOnKeyPressHandler}
             />
             <button 
                onClick={addTaskHandler}
             >+</button>
-            {props.requerInput ? <label  htmlFor='titleValue'>Title is Required</label> : null}
+            {requerInput ? <label style={{'display': 'block'}}  htmlFor='titleValue'>Title is Required</label> : null}
          </div>
          <ul>
             {props.tasks.map(task =>{
-               const removeTaskHandler = () => props.removeTask(task.id)
+               const removeTaskHandler = () => props.removeTask(task.id ,props.id)
                const changeTaskCheckedHandler = (event: ChangeEvent<HTMLInputElement>)=>{
-                     props.changeTaskChecked(task.id)
+                     props.changeTaskChecked(task.id ,props.id)
                   }
                return (
                   <li key={task.id} className={task.isDone ? 'is-done' : ''}>

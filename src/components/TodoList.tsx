@@ -1,5 +1,6 @@
-import { Button } from "@material-ui/core"
-import React, { ChangeEvent } from "react"
+import React from "react"
+import { Button, Checkbox, IconButton } from "@material-ui/core"
+import { Delete } from "@material-ui/icons"
 import { FilterType, TaskType } from "../App"
 import AddItemForm from "./AddItemForm"
 import EditableSpan from "./EditableSpan"
@@ -33,9 +34,12 @@ function TodoList(props: PropsType) {
 
    return (
       <div className='todo-list'>
-         <h3><EditableSpan title={props.title} changeTitle={changeTitleHandler}/> <button onClick={removeTodoListHandler}>x</button></h3>
-         
-         
+         <h3>
+            <EditableSpan title={props.title} changeTitle={changeTitleHandler}/> 
+            <Button onClick={removeTodoListHandler}>
+               <Delete />
+            </Button>
+         </h3>
          <div>
             <AddItemForm addItem={addTaskHandler} />
          </div>
@@ -46,16 +50,16 @@ function TodoList(props: PropsType) {
                      props.changeTaskChecked(task.id ,props.id)
                   }
                const changeTaskTitleHandler = (title: string)=>{
-                  
                   props.changeTitle(title, task.id, props.id)
-                     // props.changeTaskChecked(task.id ,props.id)
                   }
                return (
-                  <li key={task.id} className={task.isDone ? 'is-done' : ''}>
-                     <button onClick={removeTaskHandler}>X</button>
-                     <input onChange={changeTaskCheckedHandler} type='checkbox' checked={task.isDone} /> 
+                  <div key={task.id} className={task.isDone ? 'is-done' : ''}>
+                     <IconButton onClick={removeTaskHandler}>
+                        <Delete />
+                     </IconButton>
+                     <Checkbox color='primary' onChange={changeTaskCheckedHandler}  checked={task.isDone}/>
                      <EditableSpan title={task.title} changeTitle={changeTaskTitleHandler}/>
-                  </li>
+                  </div>
                )
             })}
          </div>

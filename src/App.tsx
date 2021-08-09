@@ -147,7 +147,6 @@ function App() {
               <Grid key={todoIndex} item>
                 <Paper style={{padding: '10px'}}>
                   <TodoList 
-                    
                     id={todo.id}
                     title={todo.title}
                     changeTodoTitle={changeTodoTitle}
@@ -165,11 +164,7 @@ function App() {
             )
           })}
         </Grid>
-        
       </Container>
-      
-
-      
     </div>
   )
 }

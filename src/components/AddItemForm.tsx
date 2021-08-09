@@ -1,3 +1,5 @@
+import { IconButton, TextField } from "@material-ui/core";
+import { AddBox } from "@material-ui/icons";
 import React, { KeyboardEvent,ChangeEvent, useState } from "react";
 
 
@@ -9,49 +11,51 @@ type  PropsTypes ={
 const AddItemForm:React.FC<PropsTypes> = (props)=> {
 
       let [titleValue, setTitleValue] = useState<string>('')
-      let [requerInput, setRequerInput] = useState<boolean | null>(null)
+      let [requerInput, setRequerInput] = useState<string>('')
 
    const setTitleValueHandler =(event:ChangeEvent<HTMLInputElement>)=>{
       setTitleValue(event.currentTarget.value)
    }
    const addItemOnKeyPressHandler =(event: KeyboardEvent<HTMLInputElement>)=>{
-      setRequerInput(null)
+      setRequerInput('')
       if (event.charCode === 13) {
 
          if (titleValue.trim() !== '') {
-            setRequerInput(false)   
+            setRequerInput('')   
             props.addItem(titleValue)
             setTitleValue('')
          } else {
-            setRequerInput(true)
+            setRequerInput('Title is Required')
          }
       }
    }
    const addItemFormHandler= ()=>{
       if (titleValue.trim() !== '') {
-         setRequerInput(false)
+         setRequerInput('')
          props.addItem(titleValue)
          setTitleValue('')
          } else {
-         setRequerInput(true)
+         setRequerInput('Title is Required')
          }
    }
 
    return (
-      <div>
-         <input 
-               className={requerInput ? 'requer' : ''}
-               type="text" value={titleValue} 
-               onChange={setTitleValueHandler}
-               onKeyPress={addItemOnKeyPressHandler}
+      <>
+         <TextField 
+            variant='outlined'
+            type="text" value={titleValue} 
+            onChange={setTitleValueHandler}
+            onKeyPress={addItemOnKeyPressHandler}
+            error={!!requerInput}
+            label='Title'
+            helperText={requerInput}
             />
-            <button 
-               onClick={addItemFormHandler}
-            >+</button>
-            {requerInput ? <label style={{'display': 'block'}}  htmlFor='titleValue'>Title is Required</label> : null}
-      </div>
+         <IconButton  color='primary'  onClick={addItemFormHandler}>
+            <AddBox />
+         </IconButton>
+      </>
    )
-};
+}
 
 
 

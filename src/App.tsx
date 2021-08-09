@@ -3,10 +3,7 @@ import './App.css'
 import TodoList from './components/TodoList'
 import { uuid } from 'uuidv4'
 import AddItemForm from './components/AddItemForm'
-<<<<<<< HEAD
-=======
 import { AppBar, Button, Container, Grid, IconButton, MenuItem, Paper, Toolbar, Typography } from '@material-ui/core'
->>>>>>> master
 
 export type TaskType = {
   id: string, 
@@ -89,34 +86,6 @@ function App() {
     }
   }
   const changeTitle = (title:string,taskId: string, todoListId: string)=>{
-<<<<<<< HEAD
-
-    let todolistTasks = tasks[todoListId]
-      let task = todolistTasks.find(t => t.id === taskId)
-      if (task) {
-        task.title = title
-        setTasks({...tasks})
-      }
-  }
-  const changeTodoTitle = (title:string,todoListId: string)=>{
-    
-    let newtodolist = todoLists.find(todo=> todo.id === todoListId)
-      
-      if (newtodolist) {
-        newtodolist.title = title
-        setTodoLists([...todoLists])
-      }
-  }
-
-  const addItemForm = (title: string)=>{
-    let newTodo_list_id = uuid()
-    let newItem:TodoListType = {id: newTodo_list_id, title, filter: 'all'}
-
-    setTodoLists([...todoLists,newItem])
-    setTasks({[newTodo_list_id]: [], ...tasks})
-  }
-=======
->>>>>>> master
 
     let todolistTasks = tasks[todoListId]
       let task = todolistTasks.find(t => t.id === taskId)
@@ -156,31 +125,6 @@ function App() {
 
   return (
     <div className="App">
-<<<<<<< HEAD
-      <AddItemForm 
-        addItem={addItemForm}
-      />
-      {todoLists.map((todo, todoIndex) => {
-        let tasks = getTasks(todo)
-        
-        return (
-            <TodoList 
-              key={todoIndex}
-              id={todo.id}
-              title={todo.title}
-              changeTodoTitle={changeTodoTitle}
-              filter={todo.filter}
-              tasks={tasks}
-              removeTask={removeTask}
-              setFilters={setFilters}
-              addTask={addTask}
-              removeTodoList={removeTodoList}
-              changeTaskChecked={changeTaskChecked}
-              changeTitle={changeTitle}
-            />
-        )
-      })}
-=======
       <AppBar position="static">
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu">
@@ -226,7 +170,6 @@ function App() {
       
 
       
->>>>>>> master
     </div>
   )
 }

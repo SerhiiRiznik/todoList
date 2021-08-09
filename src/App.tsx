@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './App.css'
 import TodoList from './components/TodoList'
 import { uuid } from 'uuidv4'
+import AddItemForm from './components/AddItemForm'
 
 export type TaskType = {
   id: string, 
@@ -78,11 +79,36 @@ function App() {
   const changeTaskChecked =(taskId: string, todoListId: string)=>{
     let todolistTasks = tasks[todoListId]
     let task = todolistTasks.find(t => t.id === taskId)
-    console.log(task);
     if (task) {
       task.isDone = !task.isDone
       setTasks({...tasks})
     }
+  }
+  const changeTitle = (title:string,taskId: string, todoListId: string)=>{
+
+    let todolistTasks = tasks[todoListId]
+      let task = todolistTasks.find(t => t.id === taskId)
+      if (task) {
+        task.title = title
+        setTasks({...tasks})
+      }
+  }
+  const changeTodoTitle = (title:string,todoListId: string)=>{
+    
+    let newtodolist = todoLists.find(todo=> todo.id === todoListId)
+      
+      if (newtodolist) {
+        newtodolist.title = title
+        setTodoLists([...todoLists])
+      }
+  }
+
+  const addItemForm = (title: string)=>{
+    let newTodo_list_id = uuid()
+    let newItem:TodoListType = {id: newTodo_list_id, title, filter: 'all'}
+
+    setTodoLists([...todoLists,newItem])
+    setTasks({[newTodo_list_id]: [], ...tasks})
   }
 
 
@@ -100,6 +126,9 @@ function App() {
 
   return (
     <div className="App">
+      <AddItemForm 
+        addItem={addItemForm}
+      />
       {todoLists.map((todo, todoIndex) => {
         let tasks = getTasks(todo)
         
@@ -108,6 +137,7 @@ function App() {
               key={todoIndex}
               id={todo.id}
               title={todo.title}
+              changeTodoTitle={changeTodoTitle}
               filter={todo.filter}
               tasks={tasks}
               removeTask={removeTask}
@@ -115,6 +145,7 @@ function App() {
               addTask={addTask}
               removeTodoList={removeTodoList}
               changeTaskChecked={changeTaskChecked}
+              changeTitle={changeTitle}
             />
         )
       })}

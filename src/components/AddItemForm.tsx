@@ -11,7 +11,7 @@ type  PropsTypes ={
 const AddItemForm:React.FC<PropsTypes> = (props)=> {
 
       let [titleValue, setTitleValue] = useState<string>('')
-      let [requerInput, setRequerInput] = useState<string>(''))
+      let [requerInput, setRequerInput] = useState<string>('')
 
    const setTitleValueHandler =(event:ChangeEvent<HTMLInputElement>)=>{
       setTitleValue(event.currentTarget.value)

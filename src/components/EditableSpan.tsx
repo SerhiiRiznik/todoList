@@ -2,13 +2,13 @@ import { TextField } from '@material-ui/core';
 import React, {KeyboardEvent, ChangeEvent, useState } from 'react';
 
 
-type EditableSpan = {
+type EditableSpanType = {
    title: string
    changeTitle: (title: string)=>void
 }
 
 
-const EditableSpan=(props:EditableSpan)=> {
+const EditableSpan = (props:EditableSpanType) => {
 
    let [editMode , setEditMode] = useState<boolean>(false)
    let [titleValue, setTitleValue] = useState<string>(props.title)

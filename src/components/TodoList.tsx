@@ -1,29 +1,30 @@
 import React from "react"
 import { Button, Checkbox, IconButton } from "@material-ui/core"
 import { Delete } from "@material-ui/icons"
-import { FilterType, TaskType } from "../App"
 import AddItemForm from "./AddItemForm"
 import EditableSpan from "./EditableSpan"
+import { useSelector } from "react-redux"
+import { RootState } from "../state/store"
+import { FilterType, TaskType } from "../state/todolistsReducer"
 
 type PropsType = {
-   id: string 
+   id: any
    title : string
-   tasks: Array<TaskType>
    filter: string
+   tasks: any
    removeTask: (id:string,todoListId: string)=>void
-   setFilters: (task: FilterType,todoListId: string)=>void
-   addTask:(title: string,todoListId: string)=>void
+   setFilters: (task: FilterType,todoListId: string|number)=>void
+   addTask:(title: string,todoListId: string|number)=>void
    changeTaskChecked: (taskId: string,todoListId: string)=>void
-   removeTodoList: (id: string)=>void
-   changeTitle: (title:string,taskId: string,todoListId: string)=>void
-   changeTodoTitle: (title: string,todoListId: string)=>void
+   removeTodoList: (id: string|number)=>void
+   changeTitle: (title:string,taskId: string,todoListId: string|number)=>void
+   changeTodoTitle: (title: string,todoListId: string|number)=>void
 }
 
 function TodoList(props: PropsType) {
 
    const addTaskHandler= (title:string)=>{
-         props.addTask(title,props.id)
-        
+      props.addTask(title,props.id)  
    }
    const onAllClickHandler = ()=> props.setFilters('all',props.id)
    const onActiveClickHandler = ()=>props.setFilters('active',props.id)
@@ -44,7 +45,7 @@ function TodoList(props: PropsType) {
             <AddItemForm addItem={addTaskHandler} />
          </div>
          <div>
-            {props.tasks.map(task =>{
+            {props.tasks.map((task:TaskType) =>{
                const removeTaskHandler = () => props.removeTask(task.id ,props.id)
                const changeTaskCheckedHandler = ()=>{
                      props.changeTaskChecked(task.id ,props.id)
@@ -81,3 +82,4 @@ function TodoList(props: PropsType) {
 }
 
 export default TodoList
+

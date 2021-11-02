@@ -49,6 +49,7 @@ const AddItemForm:React.FC<PropsTypes> = (props)=> {
             error={!!requerInput}
             label='Title'
             helperText={requerInput}
+            style={{width:'100%'}}
             />
          <IconButton  color='primary'  onClick={addItemFormHandler}>
             <AddBox />

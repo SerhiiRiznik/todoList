@@ -1,216 +1,132 @@
-// import { addTask } from './tasksReducer';
-// import { uuid } from 'uuidv4';
-// import { FilterType } from './../App';
-// import { TodoListType } from "../App";
 
-import { createSlice } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
+import { createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import { uuid } from "uuidv4";
+import { api } from "../api/api";
 
 export type FilterType = 'all'|'active'|'completed'
 export type TaskType = {
+   userId: number,
   id: string, 
   title: string,
-  isDone: boolean
+  completed: boolean
 }
-export type TodoListType ={
-  id: string | number
+export type Todo = {
+   id: string
   title: string
   filter: FilterType
-  tasks: Array<TaskType>
+  tasks: TaskType[]
+}
+export type TodoListType ={
+  todos :Todo[]
+  fetchingTodo: boolean
 }
 
-  let todo_list_id1 = uuid()
-  let todo_list_id2 = uuid()
-const initialState= [
-   {
-      id: uuid(), 
-      title: 'What to learn', 
-      filter: 'all',
-      tasks: [
-         {id: uuid(), title: 'Read book',isDone: true},
-         {id: uuid(), title: 'eat',isDone: true},
-         {id: uuid(), title: 'coding',isDone: false},
-         {id: uuid(), title: 'sleep',isDone: false},
-         {id: uuid(), title: 'repeat',isDone: false},
-      ]
-   },
-    {
-       id: uuid(), 
-       title: 'What to do', 
-       filter: 'all',
-       tasks:[
-          {id: uuid(), title: 'HTML&CSS',isDone: true},
-         {id: uuid(), title: 'JS',isDone: true},
-         {id: uuid(), title: 'ReactJS',isDone: false},
-         {id: uuid(), title: 'Rest API',isDone: false},
-         {id: uuid(), title: 'GraphQL',isDone: false},
-       ]
-   }
-]   as Array<TodoListType>
+  export const fetchTodo = createAsyncThunk(
+      'todos/fetch',
+      async (param:{page:number},thunkApi)=>{
+         const {page} = param
+         try {
+            const response = await api.getTodos(page)
+            return response.data
+         } catch (error) {
+            console.log(error);
+         }
+         
+      }
+   )
+
 
 export const todoListsSlice = createSlice({
-   name: 'tasks',
-   initialState,
+   name: 'todo',
+   initialState: {
+      todos:[],
+      fetchingTodo:false,
+   } as TodoListType,
    reducers: {
       addTodolist : (state,action)=>{
-         state.push({id: uuid(), title: action.payload.title, filter: 'all',tasks:[]})
-         
+         state.todos.unshift({id: uuid(), title: action.payload.title, filter: 'all',tasks:[]})  
       },
       removeTodolist : (state,action)=>{
-         console.log('removeTodolist', action.payload);
-         // debugger
-
-         const id=action.payload.todoListId
-         delete state[id]
-         // let a = state.filter((todo:any)=>todo.id !== id)
-         // state = a
+         const {todoListId} = action.payload
          
-         // const todo = state.find(e=>e.id == id)
-         //    console.log(todo);
-         //   state = state.filter((todo:any)=>todo.id !== id)
-         // state.map((todo,indx)=>{
-         //    if (todo.id === id) {
-         //       // debugger
-               
-               
-         //    }
-         // })
-            
+        state.todos = state.todos.filter(todo=> todo.id !== todoListId)
       },
       setTodolistFilter : (state,action)=>{
-         console.log('setTodolistFilter', action.payload);
-         
-         
-         // let todolist = todoLists.find((todo:any) => todo.id === todoListId)
-         let todoList = state[action.payload.todoListId]
-            console.log(todoList);
-         if (todoList) {
-           todoList.filter = action.payload.filter
-            // setTodoLists([...todoLists])
-         }
+         const {filter,todoIndex} = action.payload
+         state.todos[todoIndex].filter = filter
       },
-      setNewTodolistTitle : (state,action)=>{
-         console.log('setNewTodolistTitle', action.payload);
+      setNewTodolistTitle : (state,action)=>{         
+         const {title, todoIndex} = action.payload
+         state.todos[todoIndex].title =title
          
       },
       addTask : (state,action)=>{
-         state.map(todo=>{
-            if (action.payload.todoListId === todo.id) {
-               todo.tasks.push({
-            id: uuid(),
-            title :action.payload.title,
-            isDone: false
-         })
+         const {title, todoIndex} = action.payload
+         state.todos.map((todo,index)=>{
+            if (todoIndex === index) {
+               todo.tasks.unshift({
+                  "userId": 1,
+                  id: uuid(),
+                  title :title,
+                  completed: false
+               })
             }
-            
          })
       },
       removeTask : (state,action)=>{
-         state.map(todo=>{
-            if (action.payload.todoListId === todo.id) {
-               todo.tasks = todo.tasks.filter((t:any)=>t.id !== action.payload.taskId)
-            }
-         })
+         const {taskId, todoIndex} = action.payload   
+        state.todos[todoIndex].tasks = state.todos[todoIndex].tasks.filter(task=>task.id !== taskId)
       },
       setNewTaskTitle : (state,action)=>{
          console.log('setNewTaskTitle');
-         //    return {
-         //       type: 'SET_NEW_TASK_TITLE',
-         //       id: todoListId,
-         //       title
-         //    }
+         const {title,taskId,todoIndex} = action.payload
+            state.todos[todoIndex].tasks.map(task=>{
+               (task.id === taskId) && (task.title = title)
+            })
       },
       changeTaskChecked : (state,action)=>{
-         console.log('changeTaskChecken');
+         const {taskId, todoIndex} = action.payload
+         state.todos[todoIndex].tasks.map(task=>{
+            (task.id === taskId) && (task.completed = !task.completed)
+         })
          
       }
-}})
+   },
+   extraReducers: {
+      [fetchTodo.fulfilled.type] : (state, action)=>{
+         console.log(action);
+         state.todos.unshift({id: uuid(), title: 'from JSON placeholder', filter: 'all',tasks:action.payload })
+         state.fetchingTodo = false
+         
+      },
+      [fetchTodo.rejected.type] : (state, action)=>{
+         state.fetchingTodo = false
+         console.log(action);
+      },
+      [fetchTodo.pending.type] : (state, action)=>{
+         state.fetchingTodo = true
+         console.log(action);
+      },
+   }
+   // (builder)=>{
+   //    builder.addCase(fetchTodo.pending,(state,action)=>{
+   //       console.log('fetchTodo.pending');
+         
+   //    }),
+   //    builder.addCase(fetchTodo.fulfilled,(state,action)=>{
+   //       // @ts-ignore
+   //       console.log('fetchTodo.fulfilled');
+   //       // state.push({id: uuid(), title: 'from JSON placeholder', filter: 'all',tasks:action.payload })
+   //    }),
+   //    builder.addCase(fetchTodo.rejected,(state,action)=>{
+
+   //       console.log('fetchTodo.rejected');
+         
+   //    })
+   // }
+})
+
+
+
 export const {addTodolist,removeTodolist,setTodolistFilter,setNewTodolistTitle,addTask,removeTask,setNewTaskTitle,changeTaskChecked} = todoListsSlice.actions
 export default todoListsSlice.reducer
-
-
-
-
-// export type addTodolist = {
-//    type: 'ADD_TODOLIST'
-//    id: string
-//    title: string
-// }
-// export type removeTodolist = {
-//    type: 'REMOVE_TODOLIST'
-//    id: string
-// }
-// export type setTodolistFilter = {
-//    type: 'SET_TODOLIST_FILTER'
-//    id: string
-//    filter: FilterType
-// }
-// export type setNewTodolistTitle = {
-//    type: 'SET_NEW_TODOLIST_TITLE'
-//    id: string
-//    title: string
-// }
-
-// type ActionType = addTodolist| removeTodolist | setTodolistFilter | setNewTodolistTitle
-
-//   let todo_list_id1 = uuid()
-//   let todo_list_id2 = uuid()
-// const initialState:Array<TodoListType> = [
-//     {id: todo_list_id1, title: 'What to learn', filter: 'all'},
-//     {id: todo_list_id2, title: 'What to do', filter: 'all'}
-//   ]
-
-// const TodoListsReducer = (state=initialState , action: ActionType)=>{
-//    switch (action.type) {
-//       case 'ADD_TODOLIST':
-//          return [...state , {id: uuid(), title: action.title, filter: 'all'}]
-//       case 'REMOVE_TODOLIST':
-//          return state.filter((todo)=>todo.id !== action.id)
-//       case 'SET_TODOLIST_FILTER':
-//         let todolist = state.find(todo => todo.id === action.id)
-//          if (todolist) {
-//             todolist.filter = action.filter
-//          }
-//       return [...state]
-//       case 'SET_NEW_TODOLIST_TITLE':
-//         let newtodolist = state.find(todo=> todo.id === action.id)
-//          if (newtodolist) {
-//             newtodolist.title = action.title
-//          }
-//       return [...state]
-//       default:
-//          return state
-//    }
-// }
-
-// export const addTodolist = (todoListId: string,title:string): addTodolist=>{
-//    return {
-//       type: 'ADD_TODOLIST',
-//       id: todoListId,
-//       title
-//    }
-// }
-// export const removeTodolist = (todoListId: string): removeTodolist=>{
-//    return {
-//       type: 'REMOVE_TODOLIST',
-//       id: todoListId
-//    }
-// }
-// export const setTodolistFilter = (todoListId: string, filter:FilterType): setTodolistFilter=>{
-//    return {
-//       type: 'SET_TODOLIST_FILTER',
-//       id: todoListId,
-//       filter
-//    }
-// }
-// export const setNewTodolistTitle = (todoListId: string, title:string): setNewTodolistTitle=>{
-//    return {
-//       type: 'SET_NEW_TODOLIST_TITLE',
-//       id: todoListId,
-//       title
-//    }
-// }
-
-
-// export default TodoListsReducer

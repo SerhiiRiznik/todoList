@@ -108,22 +108,6 @@ export const todoListsSlice = createSlice({
          console.log(action);
       },
    }
-   // (builder)=>{
-   //    builder.addCase(fetchTodo.pending,(state,action)=>{
-   //       console.log('fetchTodo.pending');
-         
-   //    }),
-   //    builder.addCase(fetchTodo.fulfilled,(state,action)=>{
-   //       // @ts-ignore
-   //       console.log('fetchTodo.fulfilled');
-   //       // state.push({id: uuid(), title: 'from JSON placeholder', filter: 'all',tasks:action.payload })
-   //    }),
-   //    builder.addCase(fetchTodo.rejected,(state,action)=>{
-
-   //       console.log('fetchTodo.rejected');
-         
-   //    })
-   // }
 })
 
 
